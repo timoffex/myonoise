@@ -10,16 +10,25 @@
 
 // The only file that needs to be included to use the Myo C++ SDK is myo.hpp.
 #include <myo/myo.hpp>
+#include <fstream>
 
 #include "DataAnalyzer.h"
+#include "DataProcesser.h"
+
+
+struct Angles {
+    float roll, pitch, yaw;
+};
 
 // Classes that inherit from myo::DeviceListener can be used to receive events from Myo devices. DeviceListener
 // provides several virtual functions for handling different kinds of events. If you do not override an event, the
 // default behavior is to do nothing.
 class DataCollector : public myo::DeviceListener {
 public:
+    DataAnalyzer<Angles> dataAnalyzer;
+    
     DataCollector()
-    : onArm(false), isUnlocked(false), roll_w(0), pitch_w(0), yaw_w(0), currentPose()
+    : onArm(false), isUnlocked(false), roll_w(0), pitch_w(0), yaw_w(0), currentPose(), dataAnalyzer(500,10000)
     {
     }
 
@@ -46,16 +55,18 @@ public:
         using std::min;
 
         // Calculate Euler angles (roll, pitch, and yaw) from the unit quaternion.
-        float roll = atan2(2.0f * (quat.w() * quat.x() + quat.y() * quat.z()),
+        roll_f = atan2(2.0f * (quat.w() * quat.x() + quat.y() * quat.z()),
                            1.0f - 2.0f * (quat.x() * quat.x() + quat.y() * quat.y()));
-        float pitch = asin(max(-1.0f, min(1.0f, 2.0f * (quat.w() * quat.y() - quat.z() * quat.x()))));
-        float yaw = atan2(2.0f * (quat.w() * quat.z() + quat.x() * quat.y()),
+        pitch_f = asin(max(-1.0f, min(1.0f, 2.0f * (quat.w() * quat.y() - quat.z() * quat.x()))));
+        yaw_f = atan2(2.0f * (quat.w() * quat.z() + quat.x() * quat.y()),
                         1.0f - 2.0f * (quat.y() * quat.y() + quat.z() * quat.z()));
-
+        
+        dataAnalyzer.append_data({roll_f,pitch_f,yaw_f}, timestamp);
+        
         // Convert the floating point angles in radians to a scale from 0 to 18.
-        roll_w = static_cast<int>((roll + (float)M_PI)/(M_PI * 2.0f) * 18);
-        pitch_w = static_cast<int>((pitch + (float)M_PI/2.0f)/M_PI * 18);
-        yaw_w = static_cast<int>((yaw + (float)M_PI)/(M_PI * 2.0f) * 18);
+        roll_w = static_cast<int>((roll_f + (float)M_PI)/(M_PI * 2.0f) * 18);
+        pitch_w = static_cast<int>((pitch_f + (float)M_PI/2.0f)/M_PI * 18);
+        yaw_w = static_cast<int>((yaw_f + (float)M_PI)/(M_PI * 2.0f) * 18);
     }
 
     // onPose() is called whenever the Myo detects that the person wearing it has changed their pose, for example,
@@ -115,11 +126,11 @@ public:
     {
         // Clear the current line
         std::cout << '\r';
-
         // Print out the orientation. Orientation data is always available, even if no arm is currently recognized.
         std::cout << '[' << std::string(roll_w, '*') << std::string(18 - roll_w, ' ') << ']'
                   << '[' << std::string(pitch_w, '*') << std::string(18 - pitch_w, ' ') << ']'
                   << '[' << std::string(yaw_w, '*') << std::string(18 - yaw_w, ' ') << ']';
+        
         
         if (onArm) {
             // Print out the lock state, the currently recognized pose, and which arm Myo is being worn on.
@@ -149,11 +160,14 @@ public:
 
     // These values are set by onOrientationData() and onPose() above.
     int roll_w, pitch_w, yaw_w;
+    float roll_f, pitch_f, yaw_f;
     myo::Pose currentPose;
 };
 
 int main(int argc, char** argv)
 {
+    DataProcesser processer;
+    
     // We catch any exceptions that might occur below -- see the catch statement for more details.
     try {
 
@@ -188,12 +202,12 @@ int main(int argc, char** argv)
     while (1) {
         // In each iteration of our main loop, we run the Myo event loop for a set number of milliseconds.
         // In this case, we wish to update our display 20 times a second, so we run for 1000/20 milliseconds.
-        hub.run(1000/20);
+        hub.run(50);
         // After processing events, we call the print() member function we defined above to print out the values we've
         // obtained from any events that have occurred.
         collector.print();
     }
-
+    
     // If a standard exception occurred, we print out its message and exit.
     } catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
