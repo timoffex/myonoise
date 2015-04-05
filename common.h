@@ -33,6 +33,7 @@ class GestureBeat : public Gesture {
 public:
     GestureType type() { return Beat; }
     
+    Direction direction;
     float strength;
 };
 

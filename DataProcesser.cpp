@@ -10,6 +10,7 @@
 
 #include "DataProcesser.h"
 
-Gesture DataProcesser::analyze(DataAnalyzer<Angles> data) {
-    
+Gesture& DataProcesser::analyze(DataAnalyzer<Angles> data) {
+    GestureBeat* gb = new GestureBeat();
+    return *gb;
 }
