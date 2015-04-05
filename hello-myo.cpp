@@ -196,29 +196,30 @@ int main(int argc, char** argv)
         // Hub::run() to send events to all registered device listeners.
         hub.addListener(&collector);
 
-        std::ofstream output_p("output_p.txt");
+//        std::ofstream output_p("output_p.txt");
 //        std::ofstream output_r("output_r.txt");
 //        std::ofstream output_y("output_y.txt");
         // Finally we enter our main loop.
-        int i = 0;
-        while (i++ < 100) {
+//        int i = 0;
+        while (1) {
             // In each iteration of our main loop, we run the Myo event loop for a set number of milliseconds.
             // In this case, we wish to update our display 20 times a second, so we run for 1000/20 milliseconds.
             hub.run(50);
             // After processing events, we call the print() member function we defined above to print out the values we've
             // obtained from any events that have occurred.
-            collector.print();
+//            collector.print();
             
 
             Gesture* g = processer.analyze(collector.dataAnalyzer, 50);
-            synthesizer.incorporate(*g);
-            delete g;
-            output_p << collector.pitch_f << std::endl;
+//            if (g != nullptr && g->type() == Beat)
+//                std::cout << ((GestureBeat*)g)->strength << std::endl << std::flush;
+//            synthesizer.incorporate(*g);
+//            output_p << collector.pitch_f << std::endl;
 //            output_r << collector.roll_f << std::endl;
 //            output_y << collector.yaw_f << std::endl;
 
         }
-        output_p.close();
+//        output_p.close();
 //        output_r.close();
 //        output_y.close();
     

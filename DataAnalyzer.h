@@ -23,7 +23,17 @@ public:
     // TESTED - WORKS
     void append_data(T data, uint64_t timestamp);
     
+    T get_elem_in_past(int elems_back) {
+        int index;
+        if (history_lst_index >= elems_back)
+            index = history_lst_index-elems_back;
+        else
+            index = history_size + history_lst_index-elems_back;
+        
+        return history[index];
+    }
     
+    uint64_t get_time_difference() { return microsecond_delay; }
     
     void DEBUG_PRINT() {
         if (history_lst_index > history_fst_index) {
