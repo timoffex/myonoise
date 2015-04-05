@@ -14,7 +14,7 @@
 
 class DataProcesser {
 public:
-    Gesture analyze(DataAnalyzer<Angles>);
+    Gesture& analyze(DataAnalyzer<Angles>);
 };
 
 #endif

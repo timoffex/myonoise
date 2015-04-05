@@ -23,6 +23,8 @@ public:
     // TESTED - WORKS
     void append_data(T data, uint64_t timestamp);
     
+    
+    
     void DEBUG_PRINT() {
         if (history_lst_index > history_fst_index) {
             for (int i = history_fst_index; i <= history_lst_index; i++)
