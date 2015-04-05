@@ -9,8 +9,12 @@
 #ifndef myonoise_DataProcesser_h
 #define myonoise_DataProcesser_h
 
+#include "DataAnalyzer.h"
+#include "common.h"
+
 class DataProcesser {
-    
+public:
+    Gesture analyze(DataAnalyzer<Angles>);
 };
 
 #endif

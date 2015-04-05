@@ -14,11 +14,8 @@
 
 #include "DataAnalyzer.h"
 #include "DataProcesser.h"
-
-
-struct Angles {
-    float roll, pitch, yaw;
-};
+#include "Synthesizer.h"
+#include "common.h"
 
 // Classes that inherit from myo::DeviceListener can be used to receive events from Myo devices. DeviceListener
 // provides several virtual functions for handling different kinds of events. If you do not override an event, the
@@ -167,6 +164,7 @@ public:
 int main(int argc, char** argv)
 {
     DataProcesser processer;
+    Synthesizer synthesizer;
     
     // We catch any exceptions that might occur below -- see the catch statement for more details.
     try {
@@ -205,7 +203,9 @@ int main(int argc, char** argv)
         hub.run(50);
         // After processing events, we call the print() member function we defined above to print out the values we've
         // obtained from any events that have occurred.
-        collector.print();
+//        collector.print();
+        Gesture g = processer.analyze(collector.dataAnalyzer);
+        synthesizer.incorporate(g);
     }
     
     // If a standard exception occurred, we print out its message and exit.
