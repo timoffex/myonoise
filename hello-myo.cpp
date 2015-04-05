@@ -197,8 +197,8 @@ int main(int argc, char** argv)
         hub.addListener(&collector);
 
         std::ofstream output_p("output_p.txt");
-        std::ofstream output_r("output_r.txt");
-        std::ofstream output_y("output_y.txt");
+//        std::ofstream output_r("output_r.txt");
+//        std::ofstream output_y("output_y.txt");
         // Finally we enter our main loop.
         int i = 0;
         while (i++ < 100) {
@@ -209,16 +209,18 @@ int main(int argc, char** argv)
             // obtained from any events that have occurred.
             collector.print();
             
+
+            Gesture* g = processer.analyze(collector.dataAnalyzer, 50);
+            synthesizer.incorporate(*g);
+            delete g;
             output_p << collector.pitch_f << std::endl;
-            output_r << collector.roll_f << std::endl;
-            output_y << collector.yaw_f << std::endl;
-            
-//        Gesture& g = processer.analyze(collector.dataAnalyzer);
-//        synthesizer.incorporate(g);
+//            output_r << collector.roll_f << std::endl;
+//            output_y << collector.yaw_f << std::endl;
+
         }
         output_p.close();
-        output_r.close();
-        output_y.close();
+//        output_r.close();
+//        output_y.close();
     
 // If a standard exception occurred, we print out its message and exit.
     } catch (const std::exception& e) {

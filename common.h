@@ -23,6 +23,7 @@ enum Direction {
 
 class Gesture {
 public:
+    virtual ~Gesture() {}
     virtual GestureType type() = 0;
     int get_id() { return g_id; }
 protected:
@@ -32,6 +33,7 @@ protected:
 class GestureBeat : public Gesture {
 public:
     GestureType type() { return Beat; }
+    ~GestureBeat() {}
     
     Direction direction;
     float strength;
@@ -40,6 +42,7 @@ public:
 class GestureMotion : public Gesture {
 public:
     GestureType type() { return Motion; }
+    ~GestureMotion() {}
     
     Direction direction;
     float rate;
